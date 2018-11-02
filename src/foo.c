@@ -26,6 +26,11 @@ static void test_fini(void)
   printf("test_fini (%s:%u) called\n", __FILE__, __LINE__);
 }
 
+CU_Test(foo, foo)
+{
+  printf("test (%s:%u) called.\n", __FILE__, __LINE__);
+}
+
 CU_Test(foo, baz, .timeout=2, .init = test_init, .fini = test_fini)
 {
   printf("test (%s:%u) called.\n", __FILE__, __LINE__);

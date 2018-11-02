@@ -38,26 +38,6 @@ typedef struct {
 #define CU_CleanDecl(suite) \
   extern CU_Clean(suite)
 
-/* Microsoft Visual Studio does not like empty struct initializers, i.e.
-   no fixtures are specified. To work around that issue CU_Fixture inserts a
-   NULL initializer as fall back. */
-#ifdef _WIN32
-/* Microsoft Visual Studio does not expand __VA_ARGS__ correctly. */
-#define CU_Fixture__(...) CU_Fixture____((__VA_ARGS__))
-#define CU_Fixture____(tuple) CU_Fixture___ tuple
-#else
-#define CU_Fixture__(...) CU_Fixture___(__VA_ARGS__)
-#endif /* _WIN32 */
-
-#define CU_Fixture___(throw, away, value, ...) value
-
-#define CU_Fixture(...) \
-  CU_Fixture_( CU_Comma CU_Reduce(__VA_ARGS__,) (), __VA_ARGS__ )
-
-#define CU_Fixture_(throwaway, ...) \
-  CU_Fixture__(throwaway, ((cu_data_t){ 0 }), ((cu_data_t){ __VA_ARGS__ }))
-
-
 /* CU_Test generates a wrapper function that takes care of per-test
    initialization and deinitialization, if provided in the CU_Test
    signature. */
@@ -82,6 +62,28 @@ typedef struct {
 
 #define CU_TestDecl(suite, test) \
   extern void CU_TestProxyName(suite, test)(void)
+
+/* Microsoft Visual Studio does not like empty struct initializers, i.e.
+   no fixtures are specified. To work around that issue CU_Fixture inserts a
+   NULL initializer as fall back. */
+#define CU_Comma() ,
+#define CU_Reduce(one, ...) one
+
+#ifdef _WIN32
+/* Microsoft Visual Studio does not expand __VA_ARGS__ correctly. */
+#define CU_Fixture__(...) CU_Fixture____((__VA_ARGS__))
+#define CU_Fixture____(tuple) CU_Fixture___ tuple
+#else
+#define CU_Fixture__(...) CU_Fixture___(__VA_ARGS__)
+#endif /* _WIN32 */
+
+#define CU_Fixture___(throw, away, value, ...) value
+
+#define CU_Fixture(...) \
+  CU_Fixture_( CU_Comma CU_Reduce(__VA_ARGS__,) (), __VA_ARGS__ )
+
+#define CU_Fixture_(throwaway, ...) \
+  CU_Fixture__(throwaway, ((cu_data_t){ 0 }), ((cu_data_t){ __VA_ARGS__ }))
 
 #if defined (__cplusplus)
 }
